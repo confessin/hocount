@@ -13,5 +13,7 @@ import views
 
 
 app = webapp2.WSGIApplication([('/', views.MainPage),
-                              ('/dawg/(\d)/', views.Dawg)],
+                              ('/dawg/(\d)/', views.Dawg),
+                              ('/dawg/add', views.AddDawg),
+                              ],
                               debug=True)

@@ -9,22 +9,25 @@ __author__ = 'confessin@gmail.com (Mohammad Rafi)'
 
 
 from google.appengine.ext import db
-from google.appengine.api import users
+
+# Constants
+# Add moar choices like []
+GENDER_CHOICES = set(["Male", "Female"])
 
 
 class Dawg(db.Model):
     """Model class for Dawg."""
     name = db.StringProperty(required=True)
     bio = db.TextProperty(required=True)
-    gender = db.StringProperty(required=True)
+    gender = db.StringProperty(required=True, choices=GENDER_CHOICES)
     location = db.StringProperty()
     ytmnds = db.IntegerProperty()
     # Adding it here coz our frequent operation would be to show Dawg's Hoes
     # this would be a list of WhoseHoe keys.
-    dawgs = db.ListProperty(db.Key)
+    hoes = db.ListProperty(db.Key)
 
     added_date = db.DateTimeProperty(auto_now_add=True)
-    added_by = db.ReferenceProperty(users)
+    added_by = db.UserProperty()
 
 
 # Each Dawg can have multiple photos.
@@ -43,6 +46,6 @@ class Photo(db.Model):
 class WhoseHoe(db.Model):
     """Model class for relationships."""
 
-    added_by = db.ReferenceProperty(users)
+    added_by = db.UserProperty()
     added_date = db.DateTimeProperty(auto_now_add=True)
     vouches = db.IntegerProperty()

@@ -10,6 +10,9 @@ __author__ = 'confessin@gmail.com (Mohammad Rafi)'
 import os
 import jinja2
 import webapp2
+import forms
+
+from google.appengine.api import users
 
 # TODO: move em to settings.
 DIRNAME = os.path.join(os.path.dirname(__file__), 'templates')
@@ -20,12 +23,11 @@ jinja_environment = jinja2.Environment(
 class MainPage(webapp2.RequestHandler):
     def get(self):
         template_values = {
-            'greetings': 'foo',
             'url': 'foo',
             'url_linktext': '',
         }
 
-        template = jinja_environment.get_template('index.html')
+        template = jinja_environment.get_template('dawg.html')
         self.response.out.write(template.render(template_values))
 
 
@@ -55,6 +57,48 @@ class Dawg(webapp2.RequestHandler):
 
         """
         pass
+
+
+class AddDawg(webapp2.RequestHandler):
+    """Docstring for AddDawg """
+
+    def get(self):
+        self.response.out.write('<html><body>'
+                                '<form method="POST" '
+                                'action="/dawg/add">'
+                                '<table>')
+        # This generates our shopping list form and writes it in the response
+        self.response.out.write(forms.DawgForm())
+        self.response.out.write('</table>'
+                                '<input type="submit">'
+                                '</form></body></html>')
+        #template_values = {
+        #    'url': 'foo',
+        #    'url_linktext': '',
+        #}
+        #
+        #template = jinja_environment.get_template('dawg.html')
+        #self.response.out.write(template.render(template_values))
+
+    def post(self):
+        data = forms.DawgForm(data=self.request.POST)
+        if data.is_valid():
+            # Save the data, and redirect to the view page
+            entity = data.save(commit=False)
+            import pdb; pdb.set_trace()
+            entity.added_by = users.get_current_user().user_id()
+            entity.put()
+            self.redirect('/items.html')
+        else:
+            # Reprint the form
+            self.response.out.write('<html><body>'
+                                    '<form method="POST" '
+                                    'action="/">'
+                                    '<table>')
+            self.response.out.write(data)
+            self.response.out.write('</table>'
+                                    '<input type="submit">'
+                                    '</form></body></html>')
 
 
 class WhoseHo(webapp2.RequestHandler):
